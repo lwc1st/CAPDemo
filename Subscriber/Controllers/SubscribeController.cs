@@ -53,8 +53,7 @@ namespace Subscriber.Controllers
                 {
                     var order = new OrderInfo
                     {
-                        CreateTime = paras.Date,
-                        OrderCode = Guid.NewGuid().ToString() + "123456",
+                        OrderCode = Guid.NewGuid(),
                         UserCode = paras.UserCode
                     };
                     await _context.OrderInfos.AddAsync(order);
@@ -80,8 +79,7 @@ namespace Subscriber.Controllers
             {
                 var order = new OrderInfo
                 {
-                    CreateTime = paras.Date,
-                    OrderCode = Guid.NewGuid().ToString(),
+                    OrderCode = Guid.NewGuid(),
                     UserCode = paras.UserCode
                 };
                 await _context.OrderInfos.AddAsync(order);
@@ -98,8 +96,7 @@ namespace Subscriber.Controllers
             {
                 var order = new OrderInfo
                 {
-                    CreateTime = paras.Date,
-                    OrderCode = Guid.NewGuid().ToString() + "123456",
+                    OrderCode = Guid.NewGuid(),
                     UserCode = paras.UserCode
                 };
                 await _context.OrderInfos.AddAsync(order);

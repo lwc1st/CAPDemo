@@ -16,7 +16,7 @@ namespace Publisher.database
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {
-          
+
         }
 
         public virtual DbSet<UserInfo> UserInfos { get; set; }
@@ -31,38 +31,10 @@ namespace Publisher.database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserInfo>(entity =>
-            {
-                entity.ToTable("user_info");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .HasComment("自增ID");
-
-                entity.Property(e => e.Age)
-                    .HasColumnName("age")
-                    .HasComment("年龄");
-
-                entity.Property(e => e.Eamil)
-                    .HasColumnType("varchar(255)")
-                    .HasColumnName("eamil")
-                    .HasComment("邮箱")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
-
-                entity.Property(e => e.Name)
-                    .HasColumnType("varchar(255)")
-                    .HasColumnName("name")
-                    .HasComment("名称")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
-
-                entity.Property(e => e.UserCode)
-                    .HasColumnType("varchar(36)")
-                    .HasColumnName("user_code")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
-            });
+            modelBuilder.Entity<UserInfo>()
+                .HasIndex(b => b.UserCode)
+                .IsUnique()
+                .HasDatabaseName("Index_UserCode");
 
             OnModelCreatingPartial(modelBuilder);
         }

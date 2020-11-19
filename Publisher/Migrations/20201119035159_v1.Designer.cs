@@ -2,22 +2,24 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Subscriber.Database;
+using Publisher.database;
 
-namespace Subscriber.Migrations
+namespace Publisher.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20201119035159_v1")]
+    partial class v1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.0");
 
-            modelBuilder.Entity("Subscriber.Entities.OrderInfo", b =>
+            modelBuilder.Entity("Publisher.Entities.UserInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,9 +33,10 @@ namespace Subscriber.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("OrderCode")
+                    b.Property<string>("Name")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -44,10 +47,11 @@ namespace Subscriber.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderCode")
-                        .HasDatabaseName("Index_OrderCode");
+                    b.HasIndex("UserCode")
+                        .IsUnique()
+                        .HasDatabaseName("Index_UserCode");
 
-                    b.ToTable("OrderInfos");
+                    b.ToTable("UserInfos");
                 });
 #pragma warning restore 612, 618
         }

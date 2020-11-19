@@ -11,6 +11,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using static Publisher.EnumContainer;
 
 namespace Publisher.Controllers
 {
@@ -39,8 +40,8 @@ namespace Publisher.Controllers
         {
             await _capPublisher.PublishAsync("sample.rabbitmq.demo.dynamic", new
             {
-                Name = "jiangyi",
-                Age = 28
+                Name = "刘大大",
+                Age = 25
             });
             return Ok();
         }
@@ -50,8 +51,8 @@ namespace Publisher.Controllers
         {
             await _capPublisher.PublishAsync("sample.rabbitmq.demo.object", new Person
             {
-                Name = "jiangyi222",
-                Age = 30
+                Name = "刘大大",
+                Age = 25
             });
             return Ok();
         }
@@ -66,11 +67,14 @@ namespace Publisher.Controllers
                 {
                     var paras = new { Date = DateTime.Now, UserCode = Guid.NewGuid().ToString() };
                     //your business code
-                    connection.Execute("INSERT INTO `user_info`(`name`, `age`, `eamil`, `user_code`) VALUES (@Name, 23, 'adonet@vip.com', @UserCode);",
+                    connection.Execute("INSERT INTO `core`.`UserInfos`(`UserCode`, `Name`, `Inserted`, `LastUpdated`, `Status`) VALUES (@UserCode, @Name, @Inserted, @LastUpdated, @Status)",
                         new
                         {
-                            Name = "tran_" + paras.Date,
-                            UserCode = paras.UserCode
+                            Name = "Jon AdoNet",
+                            Inserted = paras.Date,
+                            LastUpdated = paras.Date,
+                            UserCode = paras.UserCode,
+                            Status = (int)EnumStatus.Invalid
                         }
                         , (IDbTransaction)transaction.DbTransaction);
                     _capPublisher.Publish("sample.rabbitmq.mysql.adonet.transcation", paras, "sample.rabbitmq.mysql.adonet.callbackMethod");
@@ -85,20 +89,22 @@ namespace Publisher.Controllers
         public void PublishAdonetWithTransactionCallbackMethod(dynamic param)
         {
             Debug.WriteLine($"PublishAdonetWithTransactionCallbackMethod Invoked IsSussess:{param.IsSuccess} UserCode:{param.UserCode} Msg:{param.Msg}");
+            Guid userCode = param.UserCode;
+            var user = _context.UserInfos.SingleOrDefault(x => x.UserCode == userCode);
             if ((bool)param.IsSuccess)
             {
                 //修改为成功状态
                 Debug.WriteLine($"PublishAdonetWithTransactionCallbackMethod Invoked IsSuccess");
+                user.Status = EnumStatus.Successed;
             }
             else
             {
                 //修改为失败状态
                 Debug.WriteLine($"PublishAdonetWithTransactionCallbackMethod Invoked Rollback");
-                string userCode = param.UserCode;
-                var user = _context.UserInfos.Single(x => x.UserCode == userCode);
-                _context.UserInfos.Remove(user);
-                _context.SaveChanges();
+                user.Status = EnumStatus.Failed;
             }
+            _context.UserInfos.Update(user);
+            _context.SaveChanges();
         }
 
         [HttpGet("~/ef/transaction")]
@@ -107,13 +113,12 @@ namespace Publisher.Controllers
             Debug.WriteLine($"PublishWithTranscation Invoked");
             using (var trans = _context.Database.BeginTransaction(_capPublisher, autoCommit: false))
             {
-                var paras = new { Date = DateTime.Now, UserCode = Guid.NewGuid().ToString() };
+                var paras = new { Date = DateTime.Now, UserCode = Guid.NewGuid() };
                 var user = new UserInfo
                 {
-                    UserCode = paras.UserCode,
-                    Age = 22,
-                    Eamil = "ef.transcation@vip.com",
-                    Name = "emma_" + paras.Date
+                    Name = "Jon Ef",
+                    Status = EnumContainer.EnumStatus.Invalid,
+                    UserCode = paras.UserCode
                 };
                 await _context.UserInfos.AddAsync(user);
                 _capPublisher.Publish("sample.rabbitmq.mysql.ef.transcation", paras);
@@ -129,13 +134,12 @@ namespace Publisher.Controllers
             Debug.WriteLine($"PublishWithAutoTranscation Invoked");
             using (var trans = _context.Database.BeginTransaction(_capPublisher, true))
             {
-                var paras = new { Date = DateTime.Now, UserCode = Guid.NewGuid().ToString() };
+                var paras = new { Date = DateTime.Now, UserCode = Guid.NewGuid() };
                 var user = new UserInfo
                 {
-                    UserCode = paras.UserCode,
-                    Age = 22,
-                    Eamil = "ef.transcation@vip.com",
-                    Name = "emma_" + paras.Date
+                    Name = "Jon Ef Auto",
+                    Status = EnumContainer.EnumStatus.Invalid,
+                    UserCode = paras.UserCode
                 };
                 await _context.UserInfos.AddAsync(user);
                 _capPublisher.Publish("sample.rabbitmq.mysql.ef.auto.transcation", paras);
