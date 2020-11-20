@@ -10,17 +10,13 @@ namespace Publisher
         public enum EnumStatus
         {
             /// <summary>
-            /// 未激活
+            /// 启用
             /// </summary>
-            Invalid = 1,
+            ENABLE,
             /// <summary>
-            /// 成功的
+            /// 禁用
             /// </summary>
-            Successed = 2,
-            /// <summary>
-            /// 失败的
-            /// </summary>
-            Failed = 4
+            DISABLE
         }
     }
 }

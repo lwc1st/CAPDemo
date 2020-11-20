@@ -74,7 +74,7 @@ namespace Publisher.Controllers
                             Inserted = paras.Date,
                             LastUpdated = paras.Date,
                             UserCode = paras.UserCode,
-                            Status = (int)EnumStatus.Invalid
+                            Status = (int)EnumStatus.DISABLE
                         }
                         , (IDbTransaction)transaction.DbTransaction);
                     _capPublisher.Publish("sample.rabbitmq.mysql.adonet.transcation", paras, "sample.rabbitmq.mysql.adonet.callbackMethod");
@@ -95,13 +95,13 @@ namespace Publisher.Controllers
             {
                 //修改为成功状态
                 Debug.WriteLine($"PublishAdonetWithTransactionCallbackMethod Invoked IsSuccess");
-                user.Status = EnumStatus.Successed;
+                user.Status = EnumStatus.ENABLE;
             }
             else
             {
                 //修改为失败状态
                 Debug.WriteLine($"PublishAdonetWithTransactionCallbackMethod Invoked Rollback");
-                user.Status = EnumStatus.Failed;
+                user.Status = EnumStatus.DISABLE;
             }
             _context.UserInfos.Update(user);
             _context.SaveChanges();
@@ -117,7 +117,7 @@ namespace Publisher.Controllers
                 var user = new UserInfo
                 {
                     Name = "Jon Ef",
-                    Status = EnumContainer.EnumStatus.Invalid,
+                    Status = EnumContainer.EnumStatus.DISABLE,
                     UserCode = paras.UserCode
                 };
                 await _context.UserInfos.AddAsync(user);
@@ -138,7 +138,7 @@ namespace Publisher.Controllers
                 var user = new UserInfo
                 {
                     Name = "Jon Ef Auto",
-                    Status = EnumContainer.EnumStatus.Invalid,
+                    Status = EnumContainer.EnumStatus.DISABLE,
                     UserCode = paras.UserCode
                 };
                 await _context.UserInfos.AddAsync(user);

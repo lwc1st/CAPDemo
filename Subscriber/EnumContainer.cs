@@ -9,9 +9,14 @@ namespace Subscriber
     {
         public enum EnumStatus
         {
-            Invalid = 1,
-            Successed = 2,
-            Failed = 4
+            /// <summary>
+            /// 启用
+            /// </summary>
+            ENABLE,
+            /// <summary>
+            /// 禁用
+            /// </summary>
+            DISABLE
         }
     }
 }
